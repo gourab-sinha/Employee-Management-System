@@ -8,6 +8,7 @@ using System.Text.RegularExpressions;
 
 namespace Employee_Management_System
 {
+
     class EmployeeDetails
     {
         private string employeeId;
@@ -16,9 +17,12 @@ namespace Employee_Management_System
         private string employeeAddress1;
         private string employeeAddress2;
         private string age;
-        private long employeeSalary;
+        private string employeeSalary;
         private string employeeMobileNo;
         private string employeeDOJ;
+        private string employeePreLoc;
+        static ConsoleColor fontColor = ConsoleColor.White;
+        static ConsoleColor backgroundColor = ConsoleColor.Blue;
         private string GetId(string employeeId)
         {
             int Flag = 0;
@@ -107,24 +111,30 @@ namespace Employee_Management_System
                 }
                 else
                 {
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Employee Age should be greater than or equal to 18");
+                    Console.ResetColor();
                     return GetAge(Console.ReadLine());
 
                 }
             }
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Date format not matched\n" +
                 "Possible Cases: 1. Beyond days in a month\n2. DD/MM/YYYY\n" +
                 "Please enter DOB in MM/DD/YYYY Format");
+            Console.ResetColor();
             return GetAge(Console.ReadLine());
         }
-        private long GetSalary(long salary) // Salary check
+        private string GetSalary(string salary) // Salary check
         {
-            if (salary < 0 || salary > 100000)
+            string pattern = @"^([1-9][0-9]{4}|[1-9][0-9]{3}|[1-9][[0-9]{2})$";
+            Match result = Regex.Match(salary, pattern);
+            if(result.Success)
             {
-                Console.WriteLine("Salary must be greater than zero or less than 1 Lakh\nPlease enter salary:");
-                return GetSalary(Convert.ToInt32(Console.ReadLine()));
+                return salary;
             }
-            return salary;
+            Console.WriteLine("Please enter valid salary (e.g: 16000)");
+            return GetSalary(Console.ReadLine());
         }
         private string GetMobileNo(string employeeMobileNo) // Mobile number validation
         {
@@ -134,11 +144,13 @@ namespace Employee_Management_System
             {
                 return employeeMobileNo;
             }
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Wrong Mobile No format!!");
             Console.WriteLine("Please Enter Mobile No (e.g +91 8946065442)");
+            Console.ResetColor();
             return GetMobileNo(Console.ReadLine());
         }
-        private string GetDOJ(string employeeDOJ)
+        private string GetDOJ(string employeeDOJ) //DOJ validation
         {
             string[] formats = { "MM/dd/yyyy" };
             DateTime parsedDateTime;
@@ -148,10 +160,74 @@ namespace Employee_Management_System
             {
                 return employeeDOJ + ", " + parsedDateTime.DayOfWeek.ToString();
             }
+            Console.ForegroundColor = ConsoleColor.DarkRed;
             Console.WriteLine("Please enter valid DOJ(e.g MM/DD/YYYY)");
+            Console.ResetColor();
             return GetDOJ(Console.ReadLine());
         }
-        public void CreateEmployee() // Create New Employee
+        private string GetPreferredLoc() //returns Preferred Location
+        {
+            while (true)
+            {
+                Console.WriteLine("Please Select from List\n");
+                Console.WriteLine("**************************");
+                Console.WriteLine("#1. Bengaluru");
+                Console.WriteLine("#2. Chennai");
+                Console.WriteLine("#3. Delhi");
+                Console.WriteLine("#4. Gurgram");
+                switch (Convert.ToInt32(Console.ReadLine()))
+                {
+                    case 1:
+                        return "Bengaluru";
+                    case 2:
+                        return "Chennai";
+                    case 3:
+                        return "Delhi";
+                    case 4:
+                        return "Gurgram";
+                    default:
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Invalid option");
+                        Console.ResetColor();
+                        break;
+                }
+            }
+        }
+        private static ConsoleColor chooseColor()
+        {
+            while (true)
+            {
+                Console.WriteLine("#1. RED");
+                Console.WriteLine("#2. GREEN");
+                Console.WriteLine("#3. BLACK");
+                Console.WriteLine("#4. WHITE");
+                Console.WriteLine("#5. BLUE");
+                switch (Convert.ToInt32(Console.ReadLine()))
+                {
+                    case 1:
+                        Console.WriteLine("Successfully set to RED");
+                        return ConsoleColor.Red;
+                    case 2:
+                        Console.WriteLine("Successfully set to GREEN");
+                        return ConsoleColor.Green;
+                    case 3:
+                        Console.WriteLine("Successfully set to BLACK");
+                        return ConsoleColor.Black;
+                    case 4:
+                        Console.WriteLine("Successfully set to WHITE");
+                        return ConsoleColor.White;
+                    case 5:
+                        Console.WriteLine("Successfully set to BLUE");
+                        return ConsoleColor.Blue;
+                    default:
+                        Console.ForegroundColor = ConsoleColor.DarkRed;
+                        Console.WriteLine("Please choose valid option");
+                        Console.ResetColor();
+                        break;
+                }
+            }
+        }
+        public void CreateEmployee() // Creates New Employee
         {
             Console.WriteLine("Please Enter Employee ID (e.g E104):");
             employeeId = GetId(Console.ReadLine());
@@ -166,16 +242,20 @@ namespace Employee_Management_System
             Console.WriteLine("Please Enter Employee DOB in MM/DD/YYYY format:");
             age = GetAge(Console.ReadLine());
             Console.WriteLine("Please Enter Employee Salary:");
-            employeeSalary = GetSalary(Convert.ToInt32(Console.ReadLine()));
+            employeeSalary = GetSalary(Console.ReadLine());
             Console.WriteLine("Please Enter Employee Mobile No(e.g +91 8946065442):");
             employeeMobileNo = GetMobileNo(Console.ReadLine());
             Console.WriteLine("Please Enter Employee DOJ in MM/DD/YYYY:");
             employeeDOJ = GetDOJ(Console.ReadLine());
+            Console.WriteLine("Please Enter Preferred Location");
+            employeePreLoc = GetPreferredLoc();
         }
         public void showEmployeeDetails() // Show Details of employee
         {
-            Console.BackgroundColor = ConsoleColor.White;
-            Console.ForegroundColor = ConsoleColor.Blue;
+            //Console.WriteLine("Please choose background color");
+            Console.BackgroundColor = backgroundColor;
+            //Console.WriteLine("Please choose font color");
+            Console.ForegroundColor = fontColor;
             Console.WriteLine(employeeId + ":" + employeeFirstName + " " + employeeLastName);
             Console.WriteLine(employeeAddress1);
             Console.WriteLine(age);
@@ -191,6 +271,13 @@ namespace Employee_Management_System
         public string MatchEmployee()
         {
             return employeeId;
+        }
+        public static void ColorSet()
+        {
+            Console.WriteLine("Please choose font color");
+            fontColor = chooseColor();
+            Console.WriteLine("Please choose background color");
+            backgroundColor = chooseColor();
         }
     }
 }
